@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@typeform/embed-react": "^4.6.0",
+    "firebase": "^12.9.0",
     "framer-motion": "^12.23.24",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
