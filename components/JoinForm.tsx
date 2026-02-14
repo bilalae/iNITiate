@@ -16,7 +16,7 @@ const JoinForm = () => {
           transition={{ duration: 0.5 }}
         >
           <motion.h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            Join I<span className="text-red-800">nit</span>iate
+            Join i<span className="text-red-800">NIT</span>iate
           </motion.h2>
           <motion.p className="mt-4 text-lg text-slate-400">
             Become a part of our community and start your journey of innovation.

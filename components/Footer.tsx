@@ -35,7 +35,7 @@ const Footer: React.FC<{ onNavigateToAdmin: () => void }> = ({ onNavigateToAdmin
         <div className="flex flex-col items-center justify-between md:flex-row">
             <div className="flex items-center justify-center md:justify-start">
                  <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-bold text-white">
-                    I<span className="text-red-800">nit</span>iate
+                    i<span className="text-red-800">NIT</span>iate
                 </a>
             </div>
 

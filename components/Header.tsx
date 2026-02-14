@@ -46,7 +46,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-20">
           <div className="flex-shrink-0">
             <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-bold text-white">
-              I<span className="text-red-800">nit</span>iate
+              i<span className="text-red-800">NIT</span>iate
             </a>
           </div>
           <nav className="hidden md:flex space-x-8">
