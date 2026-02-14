@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getFAQs, FAQ as FAQType } from '../services/api';
-import Loader from './Loader';
+// 1. Import the type from your dashboard instead of the old API
+import { FAQ as FAQType } from './AdminDashboard'; 
 
 const ChevronDownIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
@@ -9,24 +9,9 @@ const ChevronDownIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-const FAQ: React.FC = () => {
+// 2. Accept 'data' as a prop from App.tsx
+const FAQ: React.FC<{ data?: FAQType[] }> = ({ data = [] }) => {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
-    const [faqs, setFaqs] = useState<FAQType[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchFAQs = async () => {
-            try {
-                const data = await getFAQs();
-                setFaqs(data);
-            } catch (error) {
-                console.error("Failed to fetch FAQs:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchFAQs();
-    }, []);
 
     const toggleFAQ = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
@@ -49,17 +34,23 @@ const FAQ: React.FC = () => {
                 </motion.div>
 
                 <div className="mt-12 max-w-3xl mx-auto">
-                    {isLoading ? (
-                        <div className="flex justify-center"><Loader /></div>
+                    {/* 3. Check if data is empty (fallback) */}
+                    {data.length === 0 ? (
+                        <div className="text-center py-10 text-slate-500 italic">
+                            No questions added yet. Check back soon!
+                        </div>
                     ) : (
                         <div className="space-y-4">
-                            {faqs.map((faq, index) => (
-                                <div key={faq.id} className="bg-slate-900/70 border border-slate-800 rounded-lg overflow-hidden">
+                            {/* 4. Map directly from the data prop */}
+                            {data.map((faq, index) => (
+                                <div key={faq.id} className="bg-slate-900/70 border border-slate-800 rounded-lg overflow-hidden transition-all hover:border-slate-700">
                                     <button
                                         onClick={() => toggleFAQ(index)}
                                         className="w-full flex justify-between items-center text-left px-6 py-4 transition-colors duration-200 hover:bg-slate-800/60"
                                     >
-                                        <span className="font-medium text-lg text-white">{faq.question}</span>
+                                        <span className="font-medium text-lg text-white">
+                                            {faq.question || "Untitled Question"}
+                                        </span>
                                         <motion.span
                                             animate={{ rotate: openIndex === index ? 180 : 0 }}
                                             transition={{ duration: 0.3 }}
@@ -80,8 +71,8 @@ const FAQ: React.FC = () => {
                                             }}
                                             transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
                                         >
-                                            <div className="px-6 pb-4 text-slate-300">
-                                                {faq.answer}
+                                            <div className="px-6 pb-4 text-slate-300 border-t border-slate-800/50 pt-2">
+                                                {faq.answer || "No answer provided yet."}
                                             </div>
                                         </motion.div>
                                     )}

@@ -14,10 +14,10 @@ import Loader from './Loader';
 
 // --- Type Definitions ---
 export interface Submission { id: string; name: string; campusId: string; email: string; interests: string; submissionDate: string; subscribeNewsletter: boolean; }
-export interface Event { id: string; name?: string; description?: string; date?: string; status?: 'Upcoming' | 'Past'; imageUrl?: string; }
-export interface TeamMember { id: string; name?: string; role?: string; imageUrl?: string; githubUrl?: string; instagramUrl?: string; }
-export interface FAQ { id: string; question?: string; answer?: string; }
-export interface Goal { id: string; name?: string; description?: string; imageUrl?: string; }
+export interface Event { id: string; name?: string; description?: string; date?: string; status?: 'Upcoming' | 'Past'; imageUrl?: string; order?: number; }
+export interface TeamMember { id: string; name?: string; role?: string; imageUrl?: string; githubUrl?: string; instagramUrl?: string; order?: number; }
+export interface FAQ { id: string; question?: string; answer?: string; order?: number; }
+export interface Goal { id: string; name?: string; description?: string; imageUrl?: string; order?: number; }
 
 type Tab = 'Submissions' | 'Events' | 'Team' | 'FAQs' | 'Goals';
 type EditableItem = Event | TeamMember | FAQ | Goal;
@@ -34,13 +34,21 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
   const [faqs, setFAQs] = useState<FAQ[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
 
+  // --- Fetching & Sorting Logic ---
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
         const fetchCollection = async (colName: string) => {
             const querySnapshot = await getDocs(collection(db, colName));
-            return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+            const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+            
+            // Sort by 'order' field (ASC). Default to 999 if order is missing.
+            if (colName !== 'submissions') {
+                return docs.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999));
+            }
+            return docs;
         };
+
         const [subs, evs, tm, fq, gls] = await Promise.all([
             fetchCollection('submissions'), fetchCollection('events'),
             fetchCollection('team'), fetchCollection('faqs'), fetchCollection('goals')
@@ -55,8 +63,10 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
   const handleDelete = async (id: string, type: Tab) => {
     const col = type.toLowerCase();
     if (window.confirm(`Delete this ${type.slice(0,-1)}?`)) {
-        try { await deleteDoc(doc(db, col, id)); fetchData(); }
-        catch (e) { alert("Delete failed"); }
+        try { 
+            await deleteDoc(doc(db, col, id)); 
+            fetchData(); 
+        } catch (e) { alert("Delete failed"); }
     }
   };
 
@@ -77,11 +87,11 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
       <div className="flex justify-between items-center mb-8">
         <div>
             <h1 className="text-3xl font-extrabold text-white">Admin Dashboard</h1>
-            <p className="text-slate-400 text-sm">Managing iNITiate Science & Tech Society</p>
+            <p className="text-slate-400 text-sm italic">iNITiate Society Management</p>
         </div>
         <div className="flex space-x-4">
-            <button onClick={onBack} className="bg-slate-800 px-6 py-2 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors">&larr; Back</button>
-            <button onClick={onLogout} className="bg-red-900/50 text-red-400 px-4 py-2 rounded-lg text-sm hover:bg-red-900 transition-colors">Logout</button>
+            <button onClick={onBack} className="bg-slate-800 px-6 py-2 rounded-lg text-sm text-white hover:bg-slate-700">Back to Site</button>
+            <button onClick={onLogout} className="bg-red-950/40 text-red-400 px-4 py-2 rounded-lg text-sm hover:bg-red-900">Logout</button>
         </div>
       </div>
       
@@ -92,7 +102,7 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
             ))}
         </div>
         {activeTab !== 'Submissions' && (
-            <button onClick={() => {setEditingItem(null); setIsModalOpen(true);}} className="w-full md:w-auto bg-cyan-600 px-6 py-2 rounded-lg text-sm text-white font-bold hover:bg-cyan-500 transition-colors">Add New {activeTab.slice(0, -1)}</button>
+            <button onClick={() => {setEditingItem(null); setIsModalOpen(true);}} className="bg-cyan-600 px-6 py-2 rounded-lg text-sm text-white font-bold hover:bg-cyan-500">Add New Item</button>
         )}
       </div>
 
@@ -107,7 +117,7 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
   );
 };
 
-// --- MODAL & FORMS (Optional Fields + URL Based) ---
+// --- MODAL & FORM LOGIC ---
 
 const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
     const [loading, setLoading] = useState(false);
@@ -116,17 +126,19 @@ const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
         e.preventDefault();
         setLoading(true);
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
+        
+        // Fix: Use 'as any' to allow number assignment to the record
+        const data = Object.fromEntries(formData.entries()) as any;
+        
+        if (data.order) data.order = Number(data.order);
         const col = tab.toLowerCase();
 
         try {
             if (item) await updateDoc(doc(db, col, item.id), data);
             else await addDoc(collection(db, col), data);
             onSuccess(); onClose();
-        } catch (e) { 
-            alert("Firestore Update Failed."); 
-            console.error(e); 
-        } finally { setLoading(false); }
+        } catch (err) { alert("Database Error"); console.error(err); }
+        finally { setLoading(false); }
     };
 
     const labelStyle = "block text-xs font-bold text-slate-400 uppercase mb-1";
@@ -134,13 +146,15 @@ const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
 
     return (
         <Modal onClose={onClose} title={`${item ? "Edit" : "Add"} ${tab.slice(0, -1)}`}>
-            <form onSubmit={handleSubmit} className="max-h-[70vh] overflow-y-auto pr-2">
+            <form onSubmit={handleSubmit} className="max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
                 
-                {/* Image URL Field (Used for Team, Events, and Goals) */}
+                <label className={labelStyle}>Sort Order (Lower numbers show first)</label>
+                <input type="number" name="order" defaultValue={item?.order || 0} className={inputStyle} />
+
                 {tab !== 'FAQs' && (
                     <>
-                        <label className={labelStyle}>Image / Photo URL</label>
-                        <input name="imageUrl" defaultValue={item?.imageUrl} placeholder="https://example.com/photo.jpg" className={inputStyle} />
+                        <label className={labelStyle}>Image URL</label>
+                        <input name="imageUrl" defaultValue={item?.imageUrl} placeholder="Paste link here..." className={inputStyle} />
                     </>
                 )}
 
@@ -162,11 +176,11 @@ const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
                 {tab === 'Team' && (
                     <>
                         <label className={labelStyle}>Role</label>
-                        <input name="role" defaultValue={item?.role} placeholder="Tech Lead" className={inputStyle} />
+                        <input name="role" defaultValue={item?.role} placeholder="President" className={inputStyle} />
                         <label className={labelStyle}>GitHub URL</label>
-                        <input name="githubUrl" defaultValue={item?.githubUrl} placeholder="https://github.com/..." className={inputStyle} />
+                        <input name="githubUrl" defaultValue={item?.githubUrl} className={inputStyle} />
                         <label className={labelStyle}>Instagram URL</label>
-                        <input name="instagramUrl" defaultValue={item?.instagramUrl} placeholder="https://instagram.com/..." className={inputStyle} />
+                        <input name="instagramUrl" defaultValue={item?.instagramUrl} className={inputStyle} />
                     </>
                 )}
 
@@ -174,14 +188,14 @@ const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
                 <textarea name={tab === 'FAQs' ? "answer" : "description"} defaultValue={item?.description || item?.answer} rows={4} className={inputStyle} />
 
                 <button type="submit" disabled={loading} className="w-full bg-cyan-600 p-3 rounded-lg text-white font-bold hover:bg-cyan-500 transition-colors">
-                    {loading ? "Saving..." : "Save Changes"}
+                    {loading ? "Syncing..." : "Save Changes"}
                 </button>
             </form>
         </Modal>
     );
 };
 
-// --- TABLES ---
+// --- SHARED TABLE COMPONENTS ---
 
 const ActionButtons = ({ onEdit, onDelete }: any) => (
     <div className="flex space-x-3">
@@ -194,80 +208,70 @@ const SubmissionsTable = ({ data }: {data: Submission[]}) => (
     <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-800 text-white">
             <thead className="bg-slate-800/60">
-                <tr>
-                    <th className="px-6 py-3 text-left text-xs uppercase text-slate-400 font-bold">Name</th>
-                    <th className="px-6 py-3 text-left text-xs uppercase text-slate-400 font-bold">Email</th>
-                </tr>
+                <tr><th className="px-6 py-3 text-left text-xs uppercase text-slate-400">Name</th><th className="px-6 py-3 text-left text-xs uppercase text-slate-400">Email</th><th className="px-6 py-3 text-left text-xs uppercase text-slate-400">ID</th></tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
-                {data.map(s => (<tr key={s.id} className="hover:bg-white/5"><td className="px-6 py-4">{s.name}</td><td className="px-6 py-4 text-slate-300">{s.email}</td></tr>))}
+                {data.map(s => (<tr key={s.id} className="hover:bg-white/5"><td className="px-6 py-4">{s.name}</td><td className="px-6 py-4 text-slate-300">{s.email}</td><td className="px-6 py-4 text-slate-300">{s.campusId}</td></tr>))}
             </tbody>
         </table>
     </div>
 );
 
 const EventsTable = ({ data, onEdit, onDelete }: any) => (
-    <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800 text-white">
-            <tbody>
-                {data.map((e: any) => (
-                    <tr key={e.id} className="hover:bg-white/5">
-                        <td className="px-6 py-4"><div className="w-10 h-10 bg-slate-800 rounded overflow-hidden">{e.imageUrl && <img src={e.imageUrl} className="w-full h-full object-cover" alt="" />}</div></td>
-                        <td className="px-6 py-4 font-bold">{e.name || "Untitled"}</td>
-                        <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(e)} onDelete={() => onDelete(e.id)} /></td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
+    <table className="min-w-full divide-y divide-slate-800 text-white">
+        <tbody>
+            {data.map((e: any) => (
+                <tr key={e.id} className="hover:bg-white/5">
+                    <td className="px-6 py-4 w-16 text-slate-500 font-mono">#{e.order || 0}</td>
+                    <td className="px-6 py-4 font-bold">{e.name || "Untitled"}</td>
+                    <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(e)} onDelete={() => onDelete(e.id)} /></td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
 );
 
 const TeamTable = ({ data, onEdit, onDelete }: any) => (
-    <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800 text-white">
-            <tbody>
-                {data.map((m: any) => (
-                    <tr key={m.id} className="hover:bg-white/5">
-                        <td className="px-6 py-4"><div className="w-10 h-10 bg-slate-800 rounded-full overflow-hidden">{m.imageUrl && <img src={m.imageUrl} className="w-full h-full object-cover" alt="" />}</div></td>
-                        <td className="px-6 py-4 font-bold">{m.name || "Unknown"}</td>
-                        <td className="px-6 py-4 text-cyan-400">{m.role || "No Role"}</td>
-                        <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(m)} onDelete={() => onDelete(m.id)} /></td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
+    <table className="min-w-full divide-y divide-slate-800 text-white">
+        <tbody>
+            {data.map((m: any) => (
+                <tr key={m.id} className="hover:bg-white/5">
+                    <td className="px-6 py-4 w-16 text-slate-500 font-mono">#{m.order || 0}</td>
+                    <td className="px-6 py-4 font-bold">{m.name || "Unknown"}</td>
+                    <td className="px-6 py-4 text-cyan-400 text-sm">{m.role}</td>
+                    <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(m)} onDelete={() => onDelete(m.id)} /></td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
 );
 
 const FAQsTable = ({ data, onEdit, onDelete }: any) => (
-    <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800 text-white">
-            <tbody>
-                {data.map((f: any) => (
-                    <tr key={f.id} className="hover:bg-white/5">
-                        <td className="px-6 py-4">{f.question || "No Question"}</td>
-                        <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(f)} onDelete={() => onDelete(f.id)} /></td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
+    <table className="min-w-full divide-y divide-slate-800 text-white">
+        <tbody>
+            {data.map((f: any) => (
+                <tr key={f.id} className="hover:bg-white/5">
+                    <td className="px-6 py-4 w-16 text-slate-500 font-mono">#{f.order || 0}</td>
+                    <td className="px-6 py-4">{f.question || "No Question"}</td>
+                    <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(f)} onDelete={() => onDelete(f.id)} /></td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
 );
 
 const GoalsTable = ({ data, onEdit, onDelete }: any) => (
-    <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800 text-white">
-            <tbody>
-                {data.map((g: any) => (
-                    <tr key={g.id} className="hover:bg-white/5">
-                        <td className="px-6 py-4"><div className="w-8 h-8 bg-slate-800 rounded overflow-hidden">{g.imageUrl && <img src={g.imageUrl} className="w-full h-full object-contain" alt="" />}</div></td>
-                        <td className="px-6 py-4 font-bold">{g.name || "Untitled Goal"}</td>
-                        <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(g)} onDelete={() => onDelete(g.id)} /></td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
+    <table className="min-w-full divide-y divide-slate-800 text-white">
+        <tbody>
+            {data.map((g: any) => (
+                <tr key={g.id} className="hover:bg-white/5">
+                    <td className="px-6 py-4 w-16 text-slate-500 font-mono">#{g.order || 0}</td>
+                    <td className="px-6 py-4 font-bold">{g.name || "Untitled Goal"}</td>
+                    <td className="px-6 py-4 text-right"><ActionButtons onEdit={() => onEdit(g)} onDelete={() => onDelete(g.id)} /></td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
 );
 
 export default AdminDashboard;

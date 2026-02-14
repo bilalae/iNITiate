@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// 1. Import Firestore listeners and your database connection
-import { collection, onSnapshot, query } from 'firebase/firestore';
+// 1. Added 'orderBy' to the imports
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase'; 
 
 import AnimatedBackground from './components/AnimatedBackground';
@@ -34,44 +34,43 @@ const SectionDivider: React.FC = () => {
 const App: React.FC = () => {
   const [view, setView] = useState<'main' | 'admin'>('main');
   
-  // Persistence: Stay logged in even if the page refreshes
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     return localStorage.getItem('initiate_admin_auth') === 'true';
   });
   
   const [isPasscodeModalOpen, setIsPasscodeModalOpen] = useState(false);
 
-  // 2. States to store our live Firestore data
   const [events, setEvents] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
   const [team, setTeam] = useState<any[]>([]);
   const [faqs, setFaqs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 3. Setup Real-time Listeners
+  // 3. Setup Ordered Real-time Listeners
   useEffect(() => {
-    // Listen to 'events'
-    const unsubEvents = onSnapshot(collection(db, "events"), (snapshot) => {
+    // We create queries that specify the 'order' field for sorting
+    const qEvents = query(collection(db, "events"), orderBy("order", "asc"));
+    const qGoals = query(collection(db, "goals"), orderBy("order", "asc"));
+    const qTeam = query(collection(db, "team"), orderBy("order", "asc"));
+    const qFaqs = query(collection(db, "faqs"), orderBy("order", "asc"));
+
+    const unsubEvents = onSnapshot(qEvents, (snapshot) => {
       setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
-    // Listen to 'goals'
-    const unsubGoals = onSnapshot(collection(db, "goals"), (snapshot) => {
+    const unsubGoals = onSnapshot(qGoals, (snapshot) => {
       setGoals(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
-    // Listen to 'team'
-    const unsubTeam = onSnapshot(collection(db, "team"), (snapshot) => {
+    const unsubTeam = onSnapshot(qTeam, (snapshot) => {
       setTeam(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
-    // Listen to 'faqs'
-    const unsubFaqs = onSnapshot(collection(db, "faqs"), (snapshot) => {
+    const unsubFaqs = onSnapshot(qFaqs, (snapshot) => {
       setFaqs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      setIsLoading(false); // Stop loading once data starts arriving
+      setIsLoading(false); 
     });
 
-    // Clean up listeners when the app closes
     return () => {
       unsubEvents(); unsubGoals(); unsubTeam(); unsubFaqs();
     };
@@ -120,7 +119,6 @@ const App: React.FC = () => {
             <Hero />
             <SectionDivider />
             
-            {/* 4. We pass the data into our components as props */}
             {isLoading ? (
               <div className="flex justify-center py-20"><Loader /></div>
             ) : (
