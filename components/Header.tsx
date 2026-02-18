@@ -15,9 +15,9 @@ const XIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 
 const navLinks = [
-  { name: 'Goals', href: '#goals' },
   { name: 'Events', href: '#events' },
   { name: 'Team', href: '#team' },
+  { name: 'Goals', href: '#goals' },
   { name: 'FAQ', href: '#faq' },
   { name: 'Join', href: '#join' },
 ];

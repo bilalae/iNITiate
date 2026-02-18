@@ -123,11 +123,11 @@ const App: React.FC = () => {
               <div className="flex justify-center py-20"><Loader /></div>
             ) : (
               <>
-                <Goals data={goals} />
-                <SectionDivider />
                 <Events data={events} />
                 <SectionDivider />
                 <Team data={team} />
+                <SectionDivider />
+                <Goals data={goals} />
                 <SectionDivider />
                 <FAQ data={faqs} />
               </>

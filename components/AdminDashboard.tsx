@@ -14,7 +14,7 @@ import Loader from './Loader';
 
 // --- Type Definitions ---
 export interface Submission { id: string; name: string; campusId: string; email: string; interests: string; submissionDate: string; subscribeNewsletter: boolean; }
-export interface Event { id: string; name?: string; description?: string; date?: string; status?: 'Upcoming' | 'Past'; imageUrl?: string; order?: number; }
+export interface Event { id: string; name?: string; description?: string; date?: string; venue?: string; status?: 'Upcoming' | 'Past'; imageUrl?: string; order?: number; }
 export interface TeamMember { id: string; name?: string; role?: string; imageUrl?: string; githubUrl?: string; instagramUrl?: string; order?: number; }
 export interface FAQ { id: string; question?: string; answer?: string; order?: number; }
 export interface Goal { id: string; name?: string; description?: string; imageUrl?: string; order?: number; }
@@ -42,7 +42,6 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
             const querySnapshot = await getDocs(collection(db, colName));
             const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
             
-            // Sort by 'order' field (ASC). Default to 999 if order is missing.
             if (colName !== 'submissions') {
                 return docs.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999));
             }
@@ -90,8 +89,8 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
             <p className="text-slate-400 text-sm italic">iNITiate Society Management</p>
         </div>
         <div className="flex space-x-4">
-            <button onClick={onBack} className="bg-slate-800 px-6 py-2 rounded-lg text-sm text-white hover:bg-slate-700">Back to Site</button>
-            <button onClick={onLogout} className="bg-red-950/40 text-red-400 px-4 py-2 rounded-lg text-sm hover:bg-red-900">Logout</button>
+            <button onClick={onBack} className="bg-slate-800 px-6 py-2 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors">Back to Site</button>
+            <button onClick={onLogout} className="bg-red-950/40 text-red-400 px-4 py-2 rounded-lg text-sm hover:bg-red-900 transition-colors">Logout</button>
         </div>
       </div>
       
@@ -102,7 +101,7 @@ const AdminDashboard: React.FC<{ onBack: () => void; onLogout: () => void }> = (
             ))}
         </div>
         {activeTab !== 'Submissions' && (
-            <button onClick={() => {setEditingItem(null); setIsModalOpen(true);}} className="bg-cyan-600 px-6 py-2 rounded-lg text-sm text-white font-bold hover:bg-cyan-500">Add New Item</button>
+            <button onClick={() => {setEditingItem(null); setIsModalOpen(true);}} className="bg-cyan-600 px-6 py-2 rounded-lg text-sm text-white font-bold hover:bg-cyan-500 transition-colors">Add New Item</button>
         )}
       </div>
 
@@ -126,8 +125,6 @@ const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
         e.preventDefault();
         setLoading(true);
         const formData = new FormData(e.currentTarget);
-        
-        // Fix: Use 'as any' to allow number assignment to the record
         const data = Object.fromEntries(formData.entries()) as any;
         
         if (data.order) data.order = Number(data.order);
@@ -165,6 +162,11 @@ const ManageContentModal = ({ tab, item, onClose, onSuccess }: any) => {
                     <>
                         <label className={labelStyle}>Date</label>
                         <input name="date" defaultValue={item?.date} placeholder="Dec 5, 2025" className={inputStyle} />
+                        
+                        {/* Venue Field Added Here */}
+                        <label className={labelStyle}>Venue</label>
+                        <input name="venue" defaultValue={item?.venue} placeholder="Seminar Hall / Main Lab" className={inputStyle} />
+
                         <label className={labelStyle}>Status</label>
                         <select name="status" defaultValue={item?.status || "Upcoming"} className={inputStyle}>
                             <option value="Upcoming">Upcoming</option>
