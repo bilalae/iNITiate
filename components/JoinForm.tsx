@@ -1,10 +1,6 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { PopupButton } from "@typeform/embed-react";
 
 const JoinForm = () => {
-  const [submitted, setSubmitted] = useState(false);
-
   return (
     <section id="join" className="py-16 sm:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,13 +19,16 @@ const JoinForm = () => {
           </motion.p>
 
           <div className="mt-8">
-            <PopupButton
-              id="https://form.typeform.com/to/iBZI7D8j" // ← Typeform ID
-              className="w-full flex justify-center py-3 px-5 rounded-md text-white bg-cyan-600 hover:bg-cyan-700 transition-all duration-300 font-medium"
-              style={{ fontSize: "1rem" }}
+            <motion.a
+              href="https://chat.whatsapp.com/GxqDBd54qrzKdWlpd0amA5?mode=gi_t"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block w-full py-3 px-5 rounded-md text-white bg-cyan-600 hover:bg-cyan-700 transition-all duration-300 font-medium text-center"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Join Now
-            </PopupButton>
+              Join now!
+            </motion.a>
           </div>
         </motion.div>
       </div>
