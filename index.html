@@ -11,17 +11,14 @@
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-
   <meta
     property="og:title"
     content="Initiate: NIT's Science & Tech Society"
   />
-
   <meta
     property="og:description"
     content="A Science & Technology Society focused on skill building, growth, innovation, research, and impactful speaker series events."
   />
-
   <meta
     property="og:url"
     content="https://initiate-nit.vercel.app/"
@@ -31,43 +28,24 @@
     property="og:image"
     content="https://image2url.com/r2/default/images/1771620327086-98c5b9d6-d2cb-4091-bb7e-208000699387.jpg"
   />
-
   <meta
     property="og:image:secure_url"
     content="https://image2url.com/r2/default/images/1771620327086-98c5b9d6-d2cb-4091-bb7e-208000699387.jpg"
   />
-
-  <meta
-    property="og:image:type"
-    content="image/jpeg"
-  />
-
-  <meta
-    property="og:image:width"
-    content="1200"
-  />
-
-  <meta
-    property="og:image:height"
-    content="630"
-  />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
   <!-- Twitter -->
-  <meta
-    property="twitter:card"
-    content="summary_large_image"
-  />
-
+  <meta property="twitter:card" content="summary_large_image" />
   <meta
     property="twitter:title"
     content="Initiate: Science & Tech Society"
   />
-
   <meta
     property="twitter:description"
     content="Innovation. Research. Impact."
   />
-
   <meta
     property="twitter:image"
     content="https://image2url.com/r2/default/images/1771620327086-98c5b9d6-d2cb-4091-bb7e-208000699387.jpg"
@@ -87,36 +65,24 @@
     href="/initiate-mini-logo.png"
   />
 
-  <!-- =====================================================
-       INITIAL SAFARI PAINT
-
-       This is intentionally inline.
-
-       It can render before Tailwind, React, fonts,
-       index.css or AnimatedBackground have loaded.
-  ====================================================== -->
-
-  <meta
-    name="theme-color"
-    content="#07090d"
-  />
-
-  <meta
-    name="color-scheme"
-    content="dark"
-  />
+  <meta name="theme-color" content="#07090d" />
+  <meta name="color-scheme" content="dark" />
 
   <meta
     name="apple-mobile-web-app-status-bar-style"
     content="black-translucent"
   />
 
+  <!-- =====================================================
+       INITIAL PAINT + LOADING STATE
+  ====================================================== -->
+
   <style>
     html {
       margin: 0;
       padding: 0;
 
-      background-color: #07090d;
+      background: #07090d;
 
       color-scheme: dark;
     }
@@ -129,8 +95,7 @@
       min-height: 100vh;
       min-height: 100dvh;
 
-      background-color: #07090d;
-
+      background: #07090d;
       color: #ffffff;
 
       font-family:
@@ -148,27 +113,200 @@
       min-height: 100vh;
       min-height: 100dvh;
 
-      background-color: #07090d;
+      background: #07090d;
     }
 
-    /*
-      This exists only during the tiny period before
-      React takes control of #root.
-
-      React replaces it when the application mounts.
-    */
+    /* =====================================================
+       PRE-REACT LOADER
+    ====================================================== */
 
     #initial-paint {
       position: fixed;
       inset: 0;
+      z-index: 999999;
 
-      width: 100%;
-      height: 100vh;
-      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-      background-color: #07090d;
+      min-height: 100vh;
+      min-height: 100dvh;
+
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 58%,
+          rgba(127, 29, 29, 0.12),
+          transparent 34%
+        ),
+        #07090d;
 
       pointer-events: none;
+    }
+
+    .initial-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      transform: translateY(-2vh);
+
+      animation:
+        loader-enter 500ms cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    /* iNITiate */
+
+    .initial-brand {
+      margin: 0;
+
+      color: #ffffff;
+
+      font-size: 28px;
+      font-weight: 800;
+
+      letter-spacing: -0.055em;
+      line-height: 1;
+    }
+
+    .initial-brand-nit {
+      color: #b91c1c;
+    }
+
+    /* Initiating... */
+
+    .initial-status {
+      margin: 14px 0 0;
+
+      color: rgba(203, 213, 225, 0.58);
+
+      font-size: 11px;
+      font-weight: 500;
+
+      letter-spacing: 0.14em;
+    }
+
+    /* progress track */
+
+    .initial-progress {
+      position: relative;
+
+      width: 104px;
+      height: 1px;
+
+      margin-top: 18px;
+
+      overflow: hidden;
+
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* moving maroon light */
+
+    .initial-progress::after {
+      content: "";
+
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 42%;
+      height: 100%;
+
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #991b1b,
+        #b91c1c,
+        transparent
+      );
+
+      transform: translateX(-110%);
+
+      animation:
+        initiate-progress 1.25s
+        cubic-bezier(.4, 0, .2, 1)
+        infinite;
+    }
+
+    /* subtle light underneath */
+
+    .initial-glow {
+      position: absolute;
+
+      left: 50%;
+      top: 54%;
+
+      width: 220px;
+      height: 100px;
+
+      transform: translate(-50%, -50%);
+
+      border-radius: 999px;
+
+      background: rgba(127, 29, 29, 0.07);
+
+      filter: blur(55px);
+
+      animation:
+        glow-breathe 2.4s ease-in-out infinite;
+    }
+
+    @keyframes loader-enter {
+      from {
+        opacity: 0;
+        transform: translateY(calc(-2vh + 8px));
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(-2vh);
+      }
+    }
+
+    @keyframes initiate-progress {
+      0% {
+        transform: translateX(-110%);
+      }
+
+      55% {
+        transform: translateX(135%);
+      }
+
+      100% {
+        transform: translateX(245%);
+      }
+    }
+
+    @keyframes glow-breathe {
+      0%,
+      100% {
+        opacity: 0.45;
+        transform:
+          translate(-50%, -50%)
+          scale(0.92);
+      }
+
+      50% {
+        opacity: 1;
+        transform:
+          translate(-50%, -50%)
+          scale(1.08);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .initial-loader,
+      .initial-progress::after,
+      .initial-glow {
+        animation: none;
+      }
+
+      .initial-progress::after {
+        left: 29%;
+        transform: none;
+      }
     }
   </style>
 
@@ -204,18 +342,37 @@
     }
   </script>
 
-  <link
-    rel="stylesheet"
-    href="/index.css"
-  />
+  <link rel="stylesheet" href="/index.css" />
 </head>
 
 <body>
   <div id="root">
-    <div
-      id="initial-paint"
-      aria-hidden="true"
-    ></div>
+
+    <!--
+      Visible only before React mounts.
+      React replaces this automatically.
+    -->
+
+    <div id="initial-paint" aria-hidden="true">
+
+      <div class="initial-glow"></div>
+
+      <div class="initial-loader">
+
+        <p class="initial-brand">
+          i<span class="initial-brand-nit">NIT</span>iate
+        </p>
+
+        <p class="initial-status">
+          Initiating…
+        </p>
+
+        <div class="initial-progress"></div>
+
+      </div>
+
+    </div>
+
   </div>
 
   <script
