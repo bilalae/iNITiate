@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Primary SEO -->
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
   <title>Initiate: NIT's Science & Tech Society</title>
 
   <meta
@@ -11,14 +17,17 @@
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
+
   <meta
     property="og:title"
     content="Initiate: NIT's Science & Tech Society"
   />
+
   <meta
     property="og:description"
     content="A Science & Technology Society focused on skill building, growth, innovation, research, and impactful speaker series events."
   />
+
   <meta
     property="og:url"
     content="https://initiate-nit.vercel.app/"
@@ -28,35 +37,26 @@
     property="og:image"
     content="https://image2url.com/r2/default/images/1771620327086-98c5b9d6-d2cb-4091-bb7e-208000699387.jpg"
   />
-  <meta
-    property="og:image:secure_url"
-    content="https://image2url.com/r2/default/images/1771620327086-98c5b9d6-d2cb-4091-bb7e-208000699387.jpg"
-  />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
 
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
+  <meta
+    property="twitter:card"
+    content="summary_large_image"
+  />
+
   <meta
     property="twitter:title"
     content="Initiate: Science & Tech Society"
   />
+
   <meta
     property="twitter:description"
     content="Innovation. Research. Impact."
   />
+
   <meta
     property="twitter:image"
     content="https://image2url.com/r2/default/images/1771620327086-98c5b9d6-d2cb-4091-bb7e-208000699387.jpg"
-  />
-
-  <!-- Core -->
-  <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   />
 
   <link
@@ -65,22 +65,29 @@
     href="/initiate-mini-logo.png"
   />
 
-  <meta name="theme-color" content="#07090d" />
-  <meta name="color-scheme" content="dark" />
+  <meta
+    name="theme-color"
+    content="#07090d"
+  />
+
+  <meta
+    name="color-scheme"
+    content="dark"
+  />
 
   <meta
     name="apple-mobile-web-app-status-bar-style"
     content="black-translucent"
   />
 
-  <!-- =====================================================
-       INITIAL PAINT + LOADING STATE
-  ====================================================== -->
-
   <style>
-    html {
+    html,
+    body {
       margin: 0;
       padding: 0;
+
+      width: 100%;
+      min-height: 100%;
 
       background: #07090d;
 
@@ -88,21 +95,16 @@
     }
 
     body {
-      margin: 0;
-      padding: 0;
-
-      min-width: 100%;
       min-height: 100vh;
       min-height: 100dvh;
 
-      background: #07090d;
       color: #ffffff;
 
       font-family:
-        'Inter',
+        "Inter",
         -apple-system,
         BlinkMacSystemFont,
-        'Segoe UI',
+        "Segoe UI",
         sans-serif;
 
       -webkit-font-smoothing: antialiased;
@@ -117,7 +119,7 @@
     }
 
     /* =====================================================
-       PRE-REACT LOADER
+       INITIAL SCREEN
     ====================================================== */
 
     #initial-paint {
@@ -134,177 +136,332 @@
 
       overflow: hidden;
 
-      background:
-        radial-gradient(
-          circle at 50% 58%,
-          rgba(127, 29, 29, 0.12),
-          transparent 34%
-        ),
-        #07090d;
+      background: #07090d;
 
       pointer-events: none;
     }
 
-    .initial-loader {
+    #initial-paint::before {
+      content: "";
+
+      position: absolute;
+
+      left: 50%;
+      top: 51%;
+
+      width: 320px;
+      height: 160px;
+
+      transform: translate(-50%, -50%);
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(127, 29, 29, 0.04),
+          transparent 70%
+        );
+
+      filter: blur(40px);
+    }
+
+    /* =====================================================
+       STAGE
+    ====================================================== */
+
+    .initial-stage {
+      position: relative;
+      z-index: 2;
+
       display: flex;
       flex-direction: column;
       align-items: center;
 
-      transform: translateY(-2vh);
-
-      animation:
-        loader-enter 500ms cubic-bezier(.22, 1, .36, 1) both;
+      transform: translateY(-1vh);
     }
 
-    /* iNITiate */
+    /* =====================================================
+       WORDMARK
+    ====================================================== */
 
     .initial-brand {
+      display: flex;
+      align-items: baseline;
+
       margin: 0;
 
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.95);
 
-      font-size: 28px;
-      font-weight: 800;
+      font-family:
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 
-      letter-spacing: -0.055em;
+      font-size:
+        clamp(
+          35px,
+          9.5vw,
+          44px
+        );
+
+      font-weight: 600;
+
       line-height: 1;
+
+      letter-spacing: -0.038em;
+
+      white-space: nowrap;
     }
 
-    .initial-brand-nit {
+    .brand-i,
+    .brand-nit,
+    .brand-iate {
+      display: inline-block;
+
+      will-change:
+        transform,
+        opacity;
+    }
+
+    .brand-i {
+      opacity: 0;
+
+      transform: translateX(-4px);
+
+      animation:
+        settle-left
+        620ms
+        70ms
+        cubic-bezier(.22, 1, .36, 1)
+        forwards;
+    }
+
+    .brand-nit {
       color: #b91c1c;
+
+      opacity: 0;
+
+      transform: translateY(4px);
+
+      animation:
+        settle-nit
+        650ms
+        130ms
+        cubic-bezier(.22, 1, .36, 1)
+        forwards;
     }
 
-    /* Initiating... */
+    .brand-iate {
+      opacity: 0;
 
-    .initial-status {
-      margin: 14px 0 0;
+      transform: translateX(4px);
 
-      color: rgba(203, 213, 225, 0.58);
-
-      font-size: 11px;
-      font-weight: 500;
-
-      letter-spacing: 0.14em;
+      animation:
+        settle-right
+        620ms
+        190ms
+        cubic-bezier(.22, 1, .36, 1)
+        forwards;
     }
 
-    /* progress track */
+    /* =====================================================
+       HAIRLINE
+    ====================================================== */
 
-    .initial-progress {
+    .initial-line {
       position: relative;
 
-      width: 104px;
+      width: 68px;
       height: 1px;
 
-      margin-top: 18px;
+      margin-top: 19px;
 
       overflow: hidden;
 
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
+
+      opacity: 0;
+
+      animation:
+        fade-in
+        350ms
+        500ms
+        ease
+        forwards;
     }
 
-    /* moving maroon light */
-
-    .initial-progress::after {
+    .initial-line::after {
       content: "";
 
       position: absolute;
+
       top: 0;
-      left: 0;
+      left: -22px;
 
-      width: 42%;
-      height: 100%;
+      width: 20px;
+      height: 1px;
 
-      background: linear-gradient(
-        90deg,
-        transparent,
-        #991b1b,
-        #b91c1c,
-        transparent
-      );
-
-      transform: translateX(-110%);
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(185, 28, 28, 0.9),
+          transparent
+        );
 
       animation:
-        initiate-progress 1.25s
+        line-pass
+        1.7s
+        650ms
         cubic-bezier(.4, 0, .2, 1)
         infinite;
     }
 
-    /* subtle light underneath */
+    /* =====================================================
+       STATUS
+    ====================================================== */
 
-    .initial-glow {
-      position: absolute;
+    .initial-status {
+      margin-top: 12px;
 
-      left: 50%;
-      top: 54%;
+      color: rgba(203, 213, 225, 0.34);
 
-      width: 220px;
-      height: 100px;
+      font-family:
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 
-      transform: translate(-50%, -50%);
+      font-size: 9px;
+      font-weight: 400;
 
-      border-radius: 999px;
+      line-height: 1;
 
-      background: rgba(127, 29, 29, 0.07);
+      letter-spacing: 0.15em;
 
-      filter: blur(55px);
+      opacity: 0;
+
+      transform: translateY(2px);
 
       animation:
-        glow-breathe 2.4s ease-in-out infinite;
+        status-enter
+        400ms
+        610ms
+        ease
+        forwards;
     }
 
-    @keyframes loader-enter {
+    /* =====================================================
+       MOTION
+    ====================================================== */
+
+    @keyframes settle-left {
       from {
         opacity: 0;
-        transform: translateY(calc(-2vh + 8px));
+        transform: translateX(-4px);
       }
 
       to {
         opacity: 1;
-        transform: translateY(-2vh);
+        transform: translateX(0);
       }
     }
 
-    @keyframes initiate-progress {
-      0% {
-        transform: translateX(-110%);
+    @keyframes settle-nit {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
       }
 
-      55% {
-        transform: translateX(135%);
-      }
-
-      100% {
-        transform: translateX(245%);
-      }
-    }
-
-    @keyframes glow-breathe {
-      0%,
-      100% {
-        opacity: 0.45;
-        transform:
-          translate(-50%, -50%)
-          scale(0.92);
-      }
-
-      50% {
+      to {
         opacity: 1;
-        transform:
-          translate(-50%, -50%)
-          scale(1.08);
+        transform: translateY(0);
       }
     }
+
+    @keyframes settle-right {
+      from {
+        opacity: 0;
+        transform: translateX(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes line-pass {
+      0% {
+        left: -22px;
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 1;
+      }
+
+      58% {
+        opacity: 1;
+      }
+
+      78% {
+        left: 100%;
+        opacity: 0;
+      }
+
+      100% {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+
+    @keyframes status-enter {
+      from {
+        opacity: 0;
+        transform: translateY(2px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =====================================================
+       REDUCED MOTION
+    ====================================================== */
 
     @media (prefers-reduced-motion: reduce) {
-      .initial-loader,
-      .initial-progress::after,
-      .initial-glow {
+      .brand-i,
+      .brand-nit,
+      .brand-iate,
+      .initial-line,
+      .initial-line::after,
+      .initial-status {
         animation: none;
       }
 
-      .initial-progress::after {
-        left: 29%;
+      .brand-i,
+      .brand-nit,
+      .brand-iate,
+      .initial-line,
+      .initial-status {
+        opacity: 1;
         transform: none;
       }
     }
@@ -313,7 +470,7 @@
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fonts -->
+  <!-- Inter -->
   <link
     rel="preconnect"
     href="https://fonts.googleapis.com"
@@ -342,32 +499,44 @@
     }
   </script>
 
-  <link rel="stylesheet" href="/index.css" />
+  <link
+    rel="stylesheet"
+    href="/index.css"
+  />
 </head>
 
 <body>
+
   <div id="root">
 
-    <!--
-      Visible only before React mounts.
-      React replaces this automatically.
-    -->
+    <div
+      id="initial-paint"
+      aria-hidden="true"
+    >
 
-    <div id="initial-paint" aria-hidden="true">
-
-      <div class="initial-glow"></div>
-
-      <div class="initial-loader">
+      <div class="initial-stage">
 
         <p class="initial-brand">
-          i<span class="initial-brand-nit">NIT</span>iate
+
+          <span class="brand-i">
+            i
+          </span>
+
+          <span class="brand-nit">
+            NIT
+          </span>
+
+          <span class="brand-iate">
+            iate
+          </span>
+
         </p>
 
-        <p class="initial-status">
+        <div class="initial-line"></div>
+
+        <div class="initial-status">
           Initiating…
-        </p>
-
-        <div class="initial-progress"></div>
+        </div>
 
       </div>
 
@@ -379,5 +548,6 @@
     type="module"
     src="/index.tsx"
   ></script>
+
 </body>
 </html>
