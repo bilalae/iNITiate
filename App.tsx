@@ -117,23 +117,23 @@ const App: React.FC = () => {
           <Header />
           <main>
             <Hero />
-            <SectionDivider />
+           
             
             {isLoading ? (
               <div className="flex justify-center py-20"><Loader /></div>
             ) : (
               <>
                 <Events data={events} />
-                <SectionDivider />
+               
                 <Team data={team} />
-                <SectionDivider />
+              
                 <Goals data={goals} />
-                <SectionDivider />
+               
                 <FAQ data={faqs} />
               </>
             )}
             
-            <SectionDivider />
+           
             <JoinForm />
           </main>
           <Footer onNavigateToAdmin={navigateToAdmin} />
